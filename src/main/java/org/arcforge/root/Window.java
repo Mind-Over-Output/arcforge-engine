@@ -11,7 +11,7 @@ import org.lwjgl.opengl.*;
 
 //import java.nio.*;
 
-//import static org.lwjgl.glfw.Callbacks.*;
+import static org.lwjgl.glfw.Callbacks.*;
 import static org.lwjgl.glfw.GLFW.*;
 import static org.lwjgl.opengl.GL11.*;
 //import static org.lwjgl.system.MemoryStack.*;
@@ -41,8 +41,24 @@ public class Window {
     public void run() {
         System.out.println("Hello LWJGL " + Version.getVersion() + "!");
 
-        init();
-        loop();
+        try {
+            init();
+            loop();
+        } finally {
+            if (glfwWindow != NULL) {
+                // Free the window callbacks and destroy the window
+                glfwFreeCallbacks(glfwWindow);
+                glfwDestroyWindow(glfwWindow);
+                glfwWindow = NULL;
+            }
+
+            // Terminate GLFW and free the error callback
+            glfwTerminate();
+            GLFWErrorCallback errorCallback = glfwSetErrorCallback(null);
+            if (errorCallback != null) {
+                errorCallback.free();
+            }
+        }
     }
 
     public void init() {
